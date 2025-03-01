@@ -5,33 +5,97 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diabetes Prediction</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-<body class="bg-gray-100 p-6">
-    <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
+<body class="bg-black text-white p-6">
+    <div class="max-w-4xl mx-auto bg-gray-800 p-8 rounded-lg shadow-md">
         <h1 class="text-2xl font-bold mb-6 text-center">Diabetes Prediction</h1>
         <form action="/predict" method="post" class="space-y-4 md:space-y-0 md:grid md:grid-cols-2 md:gap-4">
             <div>
-                <label for="pregnancies" class="block text-sm font-medium text-gray-700">Pregnancies:</label>
-                <input type="number" name="pregnancies" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                <label for="pregnancies" class="block text-sm font-medium text-gray-300">Pregnancies:</label>
+                <input type="number" name="pregnancies" required class="mt-1 block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-gray-700 text-white">
             </div>
             <div>
-                <label for="glucose" class="block text-sm font-medium text-gray-700">Glucose:</label>
-                <input type="number" name="glucose" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                <label for="glucose" class="block text-sm font-medium text-gray-300">Glucose:</label>
+                <input type="number" name="glucose" required class="mt-1 block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-gray-700 text-white">
             </div>
             <div>
-                <label for="bloodpressure" class="block text-sm font-medium text-gray-700">Blood Pressure:</label>
-                <input type="number" name="bloodpressure" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                <label for="bloodpressure" class="block text-sm font-medium text-gray-300">Blood Pressure:</label>
+                <input type="number" name="bloodpressure" required class="mt-1 block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-gray-700 text-white">
             </div>
             <div>
-                <label for="skinthickness" class="block text-sm font-medium text-gray-700">Skin Thickness:</label>
-                <input type="number" name="skinthickness" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                <label for="skinthickness" class="block text-sm font-medium text-gray-300">Skin Thickness:</label>
+                <input type="number" name="skinthickness" required class="mt-1 block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-gray-700 text-white">
             </div>
             <div>
-                <label for="insulin" class="block text-sm font-medium text-gray-700">Insulin:</label>
-                <input type="number" name="insulin" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                <label for="insulin" class="block text-sm font-medium text-gray-300">Insulin:</label>
+                <input type="number" name="insulin" required class="mt-1 block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-gray-700 text-white">
             </div>
             <div>
-                <label for="bmi" class="block text-sm font-medium text-gray-700">BMI:</label>
+                <label for="bmi" class="block text-sm font-medium text-gray-300">BMI:</label>
+                <input type="number" name="bmi" required class="mt-1 block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-gray-700 text-white">
+            </div>
+            <div>
+                <label for="dpf" class="block text-sm font-medium text-gray-300">Diabetes Pedigree Function:</label>
+                <input type="number" name="dpf" step="0.01" required class="mt-1 block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-gray-700 text-white">
+            </div>
+            <div>
+                <label for="age" class="block text-sm font-medium text-gray-300">Age:</label>
+                <input type="number" name="age" required class="mt-1 block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-gray-700 text-white">
+            </div>
+            <div class="md:col-span-2 text-center">
+                <button type="submit" class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Predict</button>
+            </div>
+        </form>
+
+        {% if prediction is not none %}
+            <h2 class="mt-6 text-xl font-semibold text-center">{{ 'Diabetic' if prediction == 1 else 'Not Diabetic' }}</h2>
+        {% endif %}
+
+        <canvas id="diabetesChart" class="mt-6"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('diabetesChart').getContext('2d');
+        const diabetesChart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Logistic Regression Line',
+                    data: [], // Add logistic regression line data here
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    showLine: true,
+                    fill: false
+                }, {
+                    label: 'User Data Points',
+                    data: [], // Add user data points here
+                    backgroundColor: 'rgba(255, 99, 132, 1)'
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        title: {
+                            display: true,
+                            text: 'Glucose Level'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Likelihood of Diabetes'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
                 <input type="number" name="bmi" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
             </div>
             <div>
