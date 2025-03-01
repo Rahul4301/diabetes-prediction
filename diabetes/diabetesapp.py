@@ -5,7 +5,7 @@ from sklearn.linear_model import LogisticRegression
 app = Flask(__name__)
 
 # Load the dataset and train the model
-data = pd.read_csv('diabetes.csv')
+data = pd.read_csv('diabetes_extended.csv')
 X = data.drop('Outcome', axis=1)
 y = data['Outcome']
 model = LogisticRegression(max_iter=1000)
