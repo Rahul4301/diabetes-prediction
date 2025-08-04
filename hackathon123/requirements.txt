@@ -1,0 +1,10 @@
+streamlit
+pandas
+numpy
+torch
+torch.nn
+joblib
+matplotlib
+seaborn
+scikit-learn
+Pillow
